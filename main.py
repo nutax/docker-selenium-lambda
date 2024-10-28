@@ -1,9 +1,16 @@
 from selenium import webdriver
 from tempfile import mkdtemp
 from selenium.webdriver.common.by import By
+import time
 
 
 def handler(event=None, context=None):
+    if "url" not in event or "path" not in event:
+        return {}
+    
+    url = event["url"]
+    path = event["path"]
+    
     options = webdriver.ChromeOptions()
     service = webdriver.ChromeService("/opt/chromedriver")
 
@@ -22,6 +29,8 @@ def handler(event=None, context=None):
     options.add_argument("--remote-debugging-port=9222")
 
     chrome = webdriver.Chrome(options=options, service=service)
-    chrome.get("https://example.com/")
+    chrome.get(url)
+    
+    time.sleep(8)
 
-    return chrome.find_element(by=By.XPATH, value="//html").text
+    return chrome.find_element(by=By.XPATH, value=path).text
