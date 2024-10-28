@@ -1,7 +1,8 @@
 from selenium import webdriver
 from tempfile import mkdtemp
 from selenium.webdriver.common.by import By
-
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 def handler(event=None, context=None):
     options = webdriver.ChromeOptions()
@@ -22,6 +23,21 @@ def handler(event=None, context=None):
     options.add_argument("--remote-debugging-port=9222")
 
     chrome = webdriver.Chrome(options=options, service=service)
-    chrome.get("https://example.com/")
 
-    return chrome.find_element(by=By.XPATH, value="//html").text
+    # Get URL and XPath from event
+    url = event.get('url', 'https://example.com/')
+    xpath = event.get('xpath', '//html')
+
+    chrome.get(url)
+
+    # Wait for up to 8 seconds for the element to be present
+    try:
+        wait = WebDriverWait(chrome, 8)
+        element = wait.until(EC.presence_of_element_located((By.XPATH, xpath)))
+        text = element.text
+    except Exception as e:
+        chrome.quit()
+        return {'error': str(e)}
+
+    chrome.quit()
+    return text
