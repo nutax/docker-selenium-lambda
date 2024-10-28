@@ -1,8 +1,7 @@
 from selenium import webdriver
 from tempfile import mkdtemp
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
+import time
 
 def handler(event=None, context=None):
     options = webdriver.ChromeOptions()
@@ -30,10 +29,11 @@ def handler(event=None, context=None):
 
     chrome.get(url)
 
-    # Wait for up to 8 seconds for the element to be present
+    # Wait for 8 seconds to allow the page to load completely
+    time.sleep(8)
+
     try:
-        wait = WebDriverWait(chrome, 8)
-        element = wait.until(EC.presence_of_element_located((By.XPATH, xpath)))
+        element = chrome.find_element(by=By.XPATH, value=xpath)
         text = element.text
     except Exception as e:
         chrome.quit()
