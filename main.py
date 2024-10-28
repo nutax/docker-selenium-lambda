@@ -23,9 +23,8 @@ def handler(event=None, context=None):
 
     chrome = webdriver.Chrome(options=options, service=service)
 
-    # Get URL and XPath from event
+    # Get URL from event
     url = event.get('url', 'https://example.com/')
-    xpath = event.get('xpath', '//html')
 
     chrome.get(url)
 
@@ -33,11 +32,11 @@ def handler(event=None, context=None):
     time.sleep(8)
 
     try:
-        element = chrome.find_element(by=By.XPATH, value=xpath)
-        text = element.text
+        # Get the entire page source
+        html_content = chrome.page_source
     except Exception as e:
         chrome.quit()
         return {'error': str(e)}
 
     chrome.quit()
-    return text
+    return html_content
